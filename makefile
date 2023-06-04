@@ -1,4 +1,4 @@
 run:
-	go run .
+	go run ./cmd/.
 test:
 	go test --race ./...
