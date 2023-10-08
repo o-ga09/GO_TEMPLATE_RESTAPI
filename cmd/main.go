@@ -1,6 +1,6 @@
 package main
 
-import "main/api/controller"
+import "github.com/o-ga09/GO_TEMPLATE_RESTAPI/api/controller"
 
 func main(){
 	s, err := controller.NewServer()

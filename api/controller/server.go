@@ -1,40 +1,35 @@
 package controller
 
 import (
-	"main/api/controller/handler"
-	"time"
+	"os"
 
-	"github.com/gin-contrib/cors"
+	"github.com/o-ga09/GO_TEMPLATE_RESTAPI/api/controller/handler"
+	"github.com/o-ga09/GO_TEMPLATE_RESTAPI/api/controller/middleware"
+	"golang.org/x/exp/slog"
+
 	"github.com/gin-gonic/gin"
 )
 
 const (
-	apiVersion = "/v1"
-	langTagJa = "/ja"
-	langTagEn = "/en"
+	apiVersion = "/api/v1"
 )
 
 func NewServer() (*gin.Engine, error) {
 	r := gin.Default()
+	opts := middleware.ServerLogJsonOptions{
+		SlogOpts: slog.HandlerOptions{
+			Level: slog.LevelInfo,
+		},
+		Indent: 4,
+	}
+	loghandler := middleware.NewServerLogJsonHandler(os.Stdout,opts)
+	logger := slog.New(loghandler)
 
-	//setting a CORS
-	r.Use(cors.New(cors.Config{
-		AllowOrigins: []string{
-			"*",
-		},
-		AllowMethods: []string{
-			"POST",
-			"GET",
-			"OPTIONS",
-		},
-		AllowHeaders: []string{
-			"Content-Type",
-		},
-		AllowCredentials: false,
-		MaxAge: 24 * time.Hour,
-	}))
+	// setting a CORS
+	// setting a logger
+	r.Use(middleware.Cors(),middleware.Logger(logger))
 
-	tag := r.Group(apiVersion + langTagJa)
+	tag := r.Group(apiVersion)
 
 	{
 		systemHandler := handler.NewSystemHandler()
@@ -42,8 +37,4 @@ func NewServer() (*gin.Engine, error) {
 	}
 
 	return r,nil
-}
-
-func NewSystemHandler() {
-	panic("unimplemented")
 }
