@@ -5,6 +5,8 @@ go 1.21.0
 require (
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.9.1
+	github.com/go-playground/assert v1.2.1
+	github.com/google/uuid v1.3.1
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d
 )
 
