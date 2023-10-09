@@ -29,11 +29,11 @@ func (g *UserGateway) GetAll() (domain.Entities, error) {
 	users := domain.Entities{}
 
 	for _, r := range res {
-		suuid, _ := uuid.Parse(r.UserID)
+		suuid, _ := uuid.Parse(r.Userid)
 		u := domain.Entity{
 			Id: r.Id,
 			User: domain.UserID{V:suuid},
-			Name: domain.UserName{V: r.UserName},
+			Name: domain.UserName{V: r.Username},
 		}
 
 		users = append(users,u)
@@ -50,11 +50,11 @@ func (g *UserGateway) GetById(id domain.UserID) (domain.Entity, error) {
 		return domain.Entity{}, err
 	}
 
-	suuid, err := uuid.Parse(res.UserID)
+	suuid, err := uuid.Parse(res.Userid)
 	user := domain.Entity{
 		Id: res.Id,
 		User: domain.UserID{V: suuid},
-		Name: domain.UserName{V: res.UserName},
+		Name: domain.UserName{V: res.Username},
 	}
 
 	return user, nil
@@ -62,8 +62,8 @@ func (g *UserGateway) GetById(id domain.UserID) (domain.Entity, error) {
 
 func (g *UserGateway) Create(p domain.CreateJson) error {
 	param := repository.RepositoryParamJson{
-		UserID: p.User.V.String(),
-		UserName: p.Name.V,
+		Userid: p.User.V.String(),
+		Username: p.Name.V,
 	}
 	err := g.driver.Create(param)
 
@@ -73,8 +73,8 @@ func (g *UserGateway) Create(p domain.CreateJson) error {
 func (g *UserGateway) Update(id domain.UserID,p domain.CreateJson) error {
 	userid := id.V
 	param := repository.RepositoryParamJson{
-		UserID: p.User.V.String(),
-		UserName: p.Name.V,
+		Userid: p.User.V.String(),
+		Username: p.Name.V,
 	}
 	err := g.driver.Update(userid,param)
 

@@ -1,6 +1,8 @@
 package repository
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+)
 
 //go:generate moq -out repository_mock.go . RepositoryInterface
 type RepositoryInterface interface {
@@ -13,12 +15,21 @@ type RepositoryInterface interface {
 
 type RepositoryJsons []RepositoryJson
 type RepositoryJson struct {
-	Id int64
-	UserID string
-	UserName string
+	Id       int64  `db:"id" gorm:"primaryKey,autoincrement" json:"id,omitempty"`
+	Userid   string `db:"userid" gorm:"size:255;not null" json:"userid,omitempty" validate:"required"`
+	Username string `db:"username" gorm:"size:255;not null" json:"username,omitempty" validate:"required"`
 }
 
 type RepositoryParamJson struct {
-	UserID string
-	UserName string
+	Userid string `db:"userid" gorm:"size:255;not null"`
+	Username string `db:"username" gorm:"size:255;not null"`
 }
+
+func (RepositoryJson) TableName() string {
+	return "user"
+}
+
+func (RepositoryParamJson) TableName() string {
+	return "user"
+}
+
