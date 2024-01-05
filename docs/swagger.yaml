@@ -1,0 +1,28 @@
+definitions:
+  system.Response:
+    properties:
+      status:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: ユーザー管理サービスAPIの機能
+  title: ユーザー管理サービスAPI
+  version: v0.1.0
+paths:
+  /v1/health:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/system.Response'
+      summary: 死活監視用
+      tags:
+      - healthcheck
+swagger: "2.0"
