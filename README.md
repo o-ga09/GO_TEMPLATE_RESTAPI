@@ -1,12 +1,12 @@
 # REST API with go new template
 
-<img src="./doc/ok.png">
+<img src="./docs/ok.png">
 
-go の新しいコマンド```go new```を使用したREST APIサーバーのテンプレート
+go の新しいコマンド`go new`を使用した REST API サーバーのテンプレート
 
 ## Get Started
 
-1. ```gonew```コマンドのインストール
+1. `gonew`コマンドのインストール
 
 ```bash
 go install golang.org/x/tools/cmd/gonew@latest

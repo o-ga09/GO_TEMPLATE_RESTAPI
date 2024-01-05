@@ -4,6 +4,70 @@ definitions:
       status:
         type: string
     type: object
+  user.RequestUserParam:
+    properties:
+      birth_day:
+        type: string
+      city:
+        type: string
+      email:
+        type: string
+      extra:
+        type: string
+      first_name:
+        type: string
+      gender:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      phone_number:
+        type: string
+      post_office_number:
+        type: string
+      pref:
+        type: string
+      user___id:
+        type: string
+    type: object
+  user.Response:
+    properties:
+      status:
+        type: string
+    type: object
+  user.ResponseUser:
+    properties:
+      user:
+        $ref: '#/definitions/user.ResponseUserModel'
+    type: object
+  user.ResponseUserModel:
+    properties:
+      address:
+        type: string
+      birth_day:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      gender:
+        type: string
+      id:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      phone_number:
+        type: string
+      post_office_number:
+        type: string
+      user___id:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -25,4 +89,76 @@ paths:
       summary: 死活監視用
       tags:
       - healthcheck
+  /v1/users:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: ユーザーID
+        in: path
+        name: request
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.Response'
+      summary: ユーザー情報を削除
+      tags:
+      - DeleteUser
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/user.ResponseUser'
+            type: array
+      summary: ユーザー一覧を取得
+      tags:
+      - GetUsers
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: ユーザー情報
+        in: body
+        name: request
+        schema:
+          $ref: '#/definitions/user.RequestUserParam'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.Response'
+      summary: ユーザー情報を編集
+      tags:
+      - EditUser
+  /v1/users/:id:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ユーザーID
+        in: path
+        name: request
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/user.ResponseUser'
+      summary: ユーザーの詳細情報を取得
+      tags:
+      - GetUserById
 swagger: "2.0"
