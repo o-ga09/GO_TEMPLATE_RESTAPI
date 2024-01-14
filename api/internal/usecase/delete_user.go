@@ -8,11 +8,11 @@ import (
 )
 
 type DeleteUserUsecase struct {
-	uds user.UserDomainService
-	ads administrator.AdminDomainService
+	uds user.IUserDomainService
+	ads administrator.IAdminDomainService
 }
 
-func NewDeleteUserUsecase(uds user.UserDomainService, ads administrator.AdminDomainService) *DeleteUserUsecase {
+func NewDeleteUserUsecase(uds user.IUserDomainService, ads administrator.IAdminDomainService) *DeleteUserUsecase {
 	return &DeleteUserUsecase{uds: uds, ads: ads}
 }
 

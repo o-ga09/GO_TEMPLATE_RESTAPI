@@ -14,11 +14,11 @@ var (
 )
 
 type FindUserUsecase struct {
-	uds user.UserDomainService
-	ads administrator.AdminDomainService
+	uds user.IUserDomainService
+	ads administrator.IAdminDomainService
 }
 
-func NewFindUserUsecase(uds user.UserDomainService, ads administrator.AdminDomainService) *FindUserUsecase {
+func NewFindUserUsecase(uds user.IUserDomainService, ads administrator.IAdminDomainService) *FindUserUsecase {
 	return &FindUserUsecase{uds: uds, ads: ads}
 }
 
@@ -31,7 +31,6 @@ func (us *FindUserUsecase) Run(ctx context.Context) ([]*user.User, error) {
 
 	adminUser, err := us.ads.FindUser(ctx, value)
 	if err != nil {
-
 		return nil, err
 	}
 

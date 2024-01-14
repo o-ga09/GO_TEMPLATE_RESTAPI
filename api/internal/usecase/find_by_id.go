@@ -8,22 +8,26 @@ import (
 )
 
 type FindUserByIdUsecase struct {
-	uds user.UserDomainService
-	ads administrator.AdminDomainService
+	uds user.IUserDomainService
+	ads administrator.IAdminDomainService
 }
 
-func NewFindUserByIdUsecase(uds user.UserDomainService, ads administrator.AdminDomainService) *FindUserByIdUsecase {
+func NewFindUserByIdUsecase(uds user.IUserDomainService, ads administrator.IAdminDomainService) *FindUserByIdUsecase {
 	return &FindUserByIdUsecase{uds: uds, ads: ads}
 }
 
 func (us *FindUserByIdUsecase) Run(ctx context.Context, id string) (*user.User, error) {
 	// context.Contextの値を取り出す
 	value, ok := ctx.Value("user_id").(string)
-	if !ok {
+	if !ok  {
 		return nil, INVALID_USER_ID
 	}
 
-	adminUser, _ := us.ads.FindUser(ctx, value)
+	adminUser, err := us.ads.FindUser(ctx, value)
+	if err != nil {
+		return nil, INVALID_ADMIN
+	}
+
 	if adminUser.GetAdmin() == 1 || id == value {
 		user, err := us.uds.FindUserById(ctx, id)
 		if err != nil {

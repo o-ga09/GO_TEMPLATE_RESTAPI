@@ -8,11 +8,11 @@ import (
 )
 
 type SaveUserUsecase struct {
-	uds user.UserDomainService
-	ads administrator.AdminDomainService
+	uds user.IUserDomainService
+	ads administrator.IAdminDomainService
 }
 
-func NewSaveUserUsecase(uds user.UserDomainService, ads administrator.AdminDomainService) *SaveUserUsecase {
+func NewSaveUserUsecase(uds user.IUserDomainService, ads administrator.IAdminDomainService) *SaveUserUsecase {
 	return &SaveUserUsecase{uds: uds, ads: ads}
 }
 
@@ -23,8 +23,12 @@ func (us *SaveUserUsecase) Run(ctx context.Context, param *user.User) error {
 		return INVALID_USER_ID
 	}
 
-	adminUser, _ := us.ads.FindUser(ctx, value)
-	if adminUser.GetAdmin() == 1 || param.GetID() == value {
+	adminUser, err := us.ads.FindUser(ctx, value)
+	if err != nil {
+		return INVALID_ADMIN
+	}
+
+	if adminUser.GetAdmin() == 1 || param.GetUUID() == value {
 		if err := us.uds.EditUser(ctx, param); err != nil {
 			return err
 		}

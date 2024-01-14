@@ -1,5 +1,7 @@
 package administrator
 
+import "context"
+
 type Administrator struct {
 	id    userUUID
 	admin admin
@@ -23,4 +25,11 @@ func newAdministrator(id string, administrator int) *Administrator {
 		id: userUUID{value: id},
 		admin: admin{value: administrator},
 	}
+}
+
+//go:generate moq -out IAdminDomainService_mock.go . IAdminDomainService
+type IAdminDomainService interface {
+	FindUser(ctx context.Context, id string) (*Administrator, error)
+	EditUser(ctx context.Context, param *Administrator) error
+	DeleteUser(ctx context.Context, id string) error 
 }
