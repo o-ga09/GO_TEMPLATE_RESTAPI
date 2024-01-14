@@ -1,0 +1,15 @@
+# DEV用
+development:
+  dialect: mysql
+  dir: environment/mysql/migrate
+  datasource: ${DB_USER}:${DB_PASSWORD}@tcp(${DB_HOST:DB_PORT})/${DB_NAME_DEV}?charset=utf8&parseTime=True&loc=Local
+# STG用
+staging:
+  dialect: mysql
+  dir: environment/mysql/migrate
+  datasource: ${DB_USER}:${DB_PASSWORD}@tcp(${DB_HOST})/${DB_NAME_STG}?charset=utf8&parseTime=True&loc=Local
+# PROD用
+production:
+  dialect: mysql
+  dir: environment/mysql/migrate
+  datasource: ${DB_USER}:${DB_PASSWORD}@tcp(${DB_HOST})/${DB_NAME_PROD}?charset=utf8&parseTime=True&loc=Local
