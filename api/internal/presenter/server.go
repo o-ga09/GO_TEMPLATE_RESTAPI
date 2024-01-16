@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/o-ga09/api/internal/controller/system"
 	"github.com/o-ga09/api/internal/controller/user"
+	"github.com/o-ga09/api/internal/middleware"
 )
 
 const latest = "/v1"
@@ -15,6 +16,13 @@ type Server struct{}
 func (s *Server) Run(ctx context.Context) error {
 	r := gin.Default()
 	v1 := r.Group(latest)
+
+	// ロガーを設定
+	logger := middleware.New()
+	httpLogger := middleware.RequestLogger(logger)
+
+	// ginを使用してリクエスト情報を取得する
+	r.Use(httpLogger)
 
 	// 死活監視用
 	{
