@@ -21,6 +21,12 @@ func (s *Server) Run(ctx context.Context) error {
 	logger := middleware.New()
 	httpLogger := middleware.RequestLogger(logger)
 
+	// CORS設定関数
+	cors := middleware.CORS()
+
+	// ginにCORSを設定する
+	r.Use(cors)
+
 	// ginを使用してリクエスト情報を取得する
 	r.Use(httpLogger)
 
