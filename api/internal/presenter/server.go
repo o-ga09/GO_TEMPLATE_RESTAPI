@@ -5,8 +5,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/o-ga09/api/internal/controller/system"
-	"github.com/o-ga09/api/internal/controller/user"
+	userHandler "github.com/o-ga09/api/internal/controller/user"
+	adminDomain "github.com/o-ga09/api/internal/domain/administrator"
+	userDomain "github.com/o-ga09/api/internal/domain/user"
+	"github.com/o-ga09/api/internal/driver/mysql"
+	"github.com/o-ga09/api/internal/driver/mysql/repository"
 	"github.com/o-ga09/api/internal/middleware"
+	"github.com/o-ga09/api/internal/usecase"
 )
 
 const latest = "/v1"
@@ -36,13 +41,22 @@ func (s *Server) Run(ctx context.Context) error {
 		v1.GET("/health", systemHandler.Health)
 	}
 
+	// dependecy injection
+	conn := mysql.New(ctx)
+	UserDriver := repository.NewUserDriver(conn)
+	AdminDriver := repository.NewAdminDriver(conn)
+	UserDomainService := userDomain.NewUserDomainService(UserDriver)
+	AdminDomainService := adminDomain.NewAdminDomainService(AdminDriver)
+	usecase := usecase.NewFindUserUsecase(UserDomainService, AdminDomainService)
+	handler := userHandler.NewUserHandler(*usecase)
+
 	// ユーザー管理機能
+	users := v1.Group("/users")
 	{
-		userHandler := user.NewUserHandler()
-		v1.GET("", userHandler.GetUsers)
-		v1.GET("/:id", userHandler.GetUserById)
-		v1.POST("", userHandler.EditUser)
-		v1.DELETE("/:id", userHandler.DeleteUser)
+		users.GET("", handler.GetUsers)
+		users.GET("/:id", handler.GetUserById)
+		users.POST("", handler.EditUser)
+		users.DELETE("/:id", handler.DeleteUser)
 	}
 
 	err := r.Run()

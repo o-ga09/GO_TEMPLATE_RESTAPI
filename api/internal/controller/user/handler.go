@@ -1,8 +1,15 @@
 package user
 
-import "github.com/gin-gonic/gin"
+import (
+	"log/slog"
 
-type UserHandler struct{}
+	"github.com/gin-gonic/gin"
+	"github.com/o-ga09/api/internal/usecase"
+)
+
+type UserHandler struct {
+	usecase usecase.FindUserUsecase
+}
 
 // GetUsers godoc
 // @Summary ユーザー一覧を取得
@@ -11,7 +18,21 @@ type UserHandler struct{}
 // @Produce json
 // @Success 200 {object} []ResponseUser
 // @Router /v1/users [get]
-func (h *UserHandler) GetUsers(ctx *gin.Context) {}
+func (h *UserHandler) GetUsers(ctx *gin.Context) {
+	limit := ctx.Query("limit")
+	offset := ctx.Query("offset")
+
+	res, err := h.usecase.Run(ctx)
+	if err != nil {
+		slog.Error("debug", "error", err)
+		ctx.JSON(500, gin.H{"status": "Error"})
+		return
+	}
+
+	slog.Info("debug", "limit", limit, "offset", offset)
+	slog.Info("debug", "response", res)
+	ctx.JSON(200, gin.H{"status": "OK"})
+}
 
 // GetUserById godoc
 // @Summary ユーザーの詳細情報を取得
@@ -43,6 +64,8 @@ func (h *UserHandler) EditUser(ctx *gin.Context) {}
 // @Router /v1/users [delete]
 func (h *UserHandler) DeleteUser(ctx *gin.Context) {}
 
-func NewUserHandler() *UserHandler {
-	return &UserHandler{}
+func NewUserHandler(usecase usecase.FindUserUsecase) *UserHandler {
+	return &UserHandler{
+		usecase: usecase,
+	}
 }
