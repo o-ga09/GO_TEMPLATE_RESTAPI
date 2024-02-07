@@ -20,4 +20,5 @@
 # Go workspace file
 go.work
 .DS_Store
-environment/tmp
+environment/
+*.http
