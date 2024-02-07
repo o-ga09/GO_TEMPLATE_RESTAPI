@@ -2,9 +2,11 @@ package usecase
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/o-ga09/api/internal/domain/administrator"
 	"github.com/o-ga09/api/internal/domain/user"
+	"github.com/o-ga09/api/pkg"
 )
 
 type DeleteUserUsecase struct {
@@ -18,22 +20,15 @@ func NewDeleteUserUsecase(uds user.IUserDomainService, ads administrator.IAdminD
 
 func (us *DeleteUserUsecase) Run(ctx context.Context, id string) error {
 	// context.Contextの値を取り出す
-	value, ok := ctx.Value("user_id").(string)
+	value, ok := ctx.Value("ctxInfo").(pkg.CtxInfo)
 	if !ok {
-		return INVALID_USER_ID
+		return INVALID_REQUEST_ID
 	}
 
-	adminUser, _ := us.ads.FindUser(ctx, value)
-	if adminUser.GetAdmin() == 1 || id == value {
-		if err := us.uds.DeleteUser(ctx, id); err != nil {
-			return err
-		}
-		return nil
+	if err := us.uds.DeleteUser(ctx, id); err != nil {
+		slog.Error("process done DeleteUser Usecase", "error msg", err, "request id", value.RequestId)
+		return err
 	}
-
-	if adminUser.GetAdmin() != 1 {
-		return INVALID_ADMIN
-	}
-
-	return INVALID_USER_ID
+	slog.Info("process done DeleteUser Usecase", "request id", value.RequestId)
+	return nil
 }

@@ -21,7 +21,7 @@ var _ UserServiceRepository = &UserServiceRepositoryMock{}
 //			DeleteFunc: func(ctx context.Context, id string) error {
 //				panic("mock out the Delete method")
 //			},
-//			FindUserFunc: func(ctx context.Context) ([]*User, error) {
+//			FindUserFunc: func(ctx context.Context) ([]*User, int64, error) {
 //				panic("mock out the FindUser method")
 //			},
 //			FindUserByIdFunc: func(ctx context.Context, id string) (*User, error) {
@@ -41,7 +41,7 @@ type UserServiceRepositoryMock struct {
 	DeleteFunc func(ctx context.Context, id string) error
 
 	// FindUserFunc mocks the FindUser method.
-	FindUserFunc func(ctx context.Context) ([]*User, error)
+	FindUserFunc func(ctx context.Context) ([]*User, int64, error)
 
 	// FindUserByIdFunc mocks the FindUserById method.
 	FindUserByIdFunc func(ctx context.Context, id string) (*User, error)
@@ -121,7 +121,7 @@ func (mock *UserServiceRepositoryMock) DeleteCalls() []struct {
 }
 
 // FindUser calls FindUserFunc.
-func (mock *UserServiceRepositoryMock) FindUser(ctx context.Context) ([]*User, error) {
+func (mock *UserServiceRepositoryMock) FindUser(ctx context.Context) ([]*User, int64, error) {
 	if mock.FindUserFunc == nil {
 		panic("UserServiceRepositoryMock.FindUserFunc: method is nil but UserServiceRepository.FindUser was just called")
 	}

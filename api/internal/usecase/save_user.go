@@ -2,9 +2,11 @@ package usecase
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/o-ga09/api/internal/domain/administrator"
 	"github.com/o-ga09/api/internal/domain/user"
+	"github.com/o-ga09/api/pkg"
 )
 
 type SaveUserUsecase struct {
@@ -18,26 +20,16 @@ func NewSaveUserUsecase(uds user.IUserDomainService, ads administrator.IAdminDom
 
 func (us *SaveUserUsecase) Run(ctx context.Context, param *user.User) error {
 	// context.Contextの値を取り出す
-	value, ok := ctx.Value("user_id").(string)
+	value, ok := ctx.Value("ctxInfo").(pkg.CtxInfo)
 	if !ok {
-		return INVALID_USER_ID
+		return INVALID_REQUEST_ID
 	}
 
-	adminUser, err := us.ads.FindUser(ctx, value)
-	if err != nil {
-		return INVALID_ADMIN
+	if err := us.uds.EditUser(ctx, param); err != nil {
+		slog.Error("can not complete SaveUser Usecase", "error msg", err, "request id", value.RequestId)
+		return err
 	}
 
-	if adminUser.GetAdmin() == 1 || param.GetUUID() == value {
-		if err := us.uds.EditUser(ctx, param); err != nil {
-			return err
-		}
-		return nil
-	}
-
-	if adminUser.GetAdmin() != 1 {
-		return INVALID_ADMIN
-	}
-
-	return INVALID_USER_ID
+	slog.Info("process done SaveUser Usecase", "request id", value.RequestId)
+	return nil
 }

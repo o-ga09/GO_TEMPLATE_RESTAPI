@@ -3,6 +3,7 @@ package presenter
 import (
 	"context"
 
+	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 	"github.com/o-ga09/api/internal/controller/system"
 	userHandler "github.com/o-ga09/api/internal/controller/user"
@@ -20,7 +21,6 @@ type Server struct{}
 
 func (s *Server) Run(ctx context.Context) error {
 	r := gin.Default()
-	v1 := r.Group(latest)
 
 	// ロガーを設定
 	logger := middleware.New()
@@ -35,6 +35,10 @@ func (s *Server) Run(ctx context.Context) error {
 	// ginを使用してリクエスト情報を取得する
 	r.Use(httpLogger)
 
+	// request idを付与する
+	r.Use(requestid.New())
+
+	v1 := r.Group(latest)
 	// 死活監視用
 	{
 		systemHandler := system.NewSystemHandler()
@@ -47,8 +51,11 @@ func (s *Server) Run(ctx context.Context) error {
 	AdminDriver := repository.NewAdminDriver(conn)
 	UserDomainService := userDomain.NewUserDomainService(UserDriver)
 	AdminDomainService := adminDomain.NewAdminDomainService(AdminDriver)
-	usecase := usecase.NewFindUserUsecase(UserDomainService, AdminDomainService)
-	handler := userHandler.NewUserHandler(*usecase)
+	finduser_usecase := usecase.NewFindUserUsecase(UserDomainService, AdminDomainService)
+	findByIduser_usecase := usecase.NewFindUserByIdUsecase(UserDomainService, AdminDomainService)
+	saveuser_usecase := usecase.NewSaveUserUsecase(UserDomainService, AdminDomainService)
+	deleteuser_usecase := usecase.NewDeleteUserUsecase(UserDomainService, AdminDomainService)
+	handler := userHandler.NewUserHandler(*finduser_usecase, *findByIduser_usecase, *saveuser_usecase, *deleteuser_usecase)
 
 	// ユーザー管理機能
 	users := v1.Group("/users")

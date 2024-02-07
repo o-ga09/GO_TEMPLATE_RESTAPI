@@ -10,12 +10,12 @@ func NewUserDomainService(repo UserServiceRepository) *UserDomainService {
 	return &UserDomainService{repo: repo}
 }
 
-func (uds *UserDomainService) FindUser(ctx context.Context) ([]*User, error) {
-	users, err := uds.repo.FindUser(ctx)
+func (uds *UserDomainService) FindUser(ctx context.Context) ([]*User, int64, error) {
+	users, count, err := uds.repo.FindUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return users, nil
+	return users, count, nil
 }
 
 func (uds *UserDomainService) FindUserById(ctx context.Context, id string) (*User, error) {

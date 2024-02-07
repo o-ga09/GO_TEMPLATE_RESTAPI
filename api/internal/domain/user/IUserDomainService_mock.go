@@ -24,7 +24,7 @@ var _ IUserDomainService = &IUserDomainServiceMock{}
 //			EditUserFunc: func(ctx context.Context, param *User) error {
 //				panic("mock out the EditUser method")
 //			},
-//			FindUserFunc: func(ctx context.Context) ([]*User, error) {
+//			FindUserFunc: func(ctx context.Context) ([]*User, int64, error) {
 //				panic("mock out the FindUser method")
 //			},
 //			FindUserByIdFunc: func(ctx context.Context, id string) (*User, error) {
@@ -44,7 +44,7 @@ type IUserDomainServiceMock struct {
 	EditUserFunc func(ctx context.Context, param *User) error
 
 	// FindUserFunc mocks the FindUser method.
-	FindUserFunc func(ctx context.Context) ([]*User, error)
+	FindUserFunc func(ctx context.Context) ([]*User, int64, error)
 
 	// FindUserByIdFunc mocks the FindUserById method.
 	FindUserByIdFunc func(ctx context.Context, id string) (*User, error)
@@ -157,7 +157,7 @@ func (mock *IUserDomainServiceMock) EditUserCalls() []struct {
 }
 
 // FindUser calls FindUserFunc.
-func (mock *IUserDomainServiceMock) FindUser(ctx context.Context) ([]*User, error) {
+func (mock *IUserDomainServiceMock) FindUser(ctx context.Context) ([]*User, int64, error) {
 	if mock.FindUserFunc == nil {
 		panic("IUserDomainServiceMock.FindUserFunc: method is nil but IUserDomainService.FindUser was just called")
 	}

@@ -3,9 +3,12 @@ package repository
 import (
 	"context"
 	"errors"
+	"log/slog"
+	"strconv"
 
 	userDomain "github.com/o-ga09/api/internal/domain/user"
 	"github.com/o-ga09/api/internal/driver/mysql/scheme"
+	"github.com/o-ga09/api/pkg"
 
 	"gorm.io/gorm"
 )
@@ -16,55 +19,80 @@ type UserDriver struct {
 
 // Delete implements user.UserServiceRepository.
 func (ud *UserDriver) Delete(ctx context.Context, id string) error {
+	ctxValue := ctx.Value("ctxInfo").(pkg.CtxInfo)
 	user := scheme.User{}
 	err := ud.conn.Where("uid = ?", id).Delete(&user).Error
 	if err != nil {
+		slog.Info("can not complete DeleteUser Repository", "request id", ctxValue.RequestId)
 		return err
 	}
 
+	slog.Info("process done DeleteUser Repository", "request id", ctxValue.RequestId)
 	return nil
 }
 
 // FindUser implements user.UserServiceRepository.
-func (ud *UserDriver) FindUser(ctx context.Context) ([]*userDomain.User, error) {
+func (ud *UserDriver) FindUser(ctx context.Context) ([]*userDomain.User, int64, error) {
+	ctxValue := ctx.Value("ctxInfo").(pkg.CtxInfo)
 	res := []*userDomain.User{}
 	users := []*scheme.User{}
-	err := ud.conn.Find(&users).Error
+	var totalCount int64
+
+	limit, err := strconv.Atoi(ctxValue.Limit)
 	if err != nil {
-		return nil, err
+		limit = 100
+	}
+	offset, err := strconv.Atoi(ctxValue.Offset)
+	if err != nil {
+		offset = 0
+	}
+
+	err = ud.conn.Limit(limit).Offset(offset).Order("id ASC").Find(&users).Count(&totalCount).Error
+	if err != nil {
+		slog.Error("can not complate FindByID Repository", "error msg", err, "request id", ctxValue.RequestId)
+		return nil, 0, err
 	}
 
 	for _, user := range users {
 		u := userDomain.NewUser(user.UID, user.Email, user.Password, user.UserID, user.FirstName, user.LastName, user.Gender, user.BirthDay, user.PhoneNumber, user.PostOfficeNumber, user.Pref, user.City, user.Extra)
 		if err != nil {
-			return nil, err
+			slog.Error("can not complate FindByID Repository", "error msg", err, "request id", ctxValue.RequestId)
+			return nil, 0, err
 		}
 
 		res = append(res, u)
 	}
 
-	return res, nil
+	slog.Info("process done FindByID Repository", "request id", ctxValue.RequestId, "total count", totalCount)
+	return res, totalCount, nil
 }
 
 // FindUserById implements user.UserServiceRepository.
 func (ud *UserDriver) FindUserById(ctx context.Context, id string) (*userDomain.User, error) {
+	ctxValue := ctx.Value("ctxInfo").(pkg.CtxInfo)
 	user := scheme.User{}
 
 	err := ud.conn.Where("user_id = ?", id).Find(&user).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
+		slog.Error("can not complate FindByID Repository", "request id", ctxValue.RequestId)
 		return nil, gorm.ErrRecordNotFound
 	}
 
 	res := userDomain.NewUser(user.UID, user.Email, user.Password, user.UserID, user.FirstName, user.LastName, user.Gender, user.BirthDay, user.PhoneNumber, user.PostOfficeNumber, user.Pref, user.City, user.Extra)
 	if err != nil {
+		slog.Error("can not complete FindByID Repository", "request id", ctxValue.RequestId)
 		return nil, err
 	}
+
+	slog.Info("process done FindByID Repository", "request id", ctxValue.RequestId)
 	return res, nil
 }
 
 // Save implements user.UserServiceRepository.
 func (ud *UserDriver) Save(ctx context.Context, param *userDomain.User) error {
+	ctxValue := ctx.Value("ctxInfo").(pkg.CtxInfo)
+
 	repoUser := scheme.User{
 		UID:              param.GetUUID(),
 		UserID:           param.GetID(),
@@ -82,6 +110,12 @@ func (ud *UserDriver) Save(ctx context.Context, param *userDomain.User) error {
 	}
 
 	err := ud.conn.Save(&repoUser).Error
+	if err != nil {
+		slog.Error("can not complete SaveUser Repository", "request id", ctxValue.RequestId)
+		return err
+	}
+
+	slog.Info("process done SaveUser Repository", "request id", ctxValue.RequestId)
 	return err
 }
 

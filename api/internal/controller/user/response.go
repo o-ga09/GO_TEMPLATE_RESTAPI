@@ -1,7 +1,10 @@
 package user
 
 type ResponseUser struct {
-	User ResponseUserModel `json:"user,omitempty"`
+	TotalCount int               `json:"total_count,omitempty"`
+	Count      int               `json:"count,omitempty"`
+	Offset     int               `json:"offset,omitempty"`
+	User       ResponseUserModel `json:"user,omitempty"`
 }
 
 type ResponseUserModel struct {

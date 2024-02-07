@@ -240,7 +240,7 @@ func newUser(id string, email string, password string, user_id string, first_nam
 
 //go:generate moq -out IUserDomainService_mock.go . IUserDomainService
 type IUserDomainService interface {
-	FindUser(ctx context.Context) ([]*User, error)
+	FindUser(ctx context.Context) ([]*User, int64, error)
 	FindUserById(ctx context.Context, id string) (*User, error)
 	EditUser(ctx context.Context, param *User) error
 	DeleteUser(ctx context.Context, id string) error
