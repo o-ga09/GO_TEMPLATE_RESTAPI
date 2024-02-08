@@ -1,6 +1,6 @@
 # 【ハンズオン】作って学ぶ！Go言語でつくるREST API開発 2024年版
 
-<img src="./doc/image.png">
+<img src="./docs/image.png">
 
 Zennの書籍「Go言語でつくるREST API開発 2024年版」の参考リポイトリです。
 
