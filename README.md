@@ -1,33 +1,35 @@
-# REST API with go new template
+# 【ハンズオン】作って学ぶ！Go言語でつくるREST API開発 2024年版
 
-<img src="./docs/ok.png">
+<img src="./docs/image.png">
 
-go の新しいコマンド`go new`を使用した REST API サーバーのテンプレート
+Zennの書籍「Go言語でつくるREST API開発 2024年版」の参考リポイトリです。
 
 ## Get Started
 
-1. `gonew`コマンドのインストール
+1. リポジトリをダウンロード
 
 ```bash
-go install golang.org/x/tools/cmd/gonew@latest
+git clone https://github.com/o-ga09/GO_TEMPLATE_RESTAPI.git
 ```
 
-2. 本テンプレートのインストール
 
-任意のディレクトリで実行する
+
+2. モジュールダウンロード
 
 ```bash
+cd GO_TEMPLATE_RESTAPI
+go mod tidy
+```
 
-# gonew https://github.com/o-ga09/GO_TEMPLATE_RESTAPI [好きなモジュール名]
-gonew https://github.com/o-ga09/GO_TEMPLATE_RESTAPI github.com/restapi-server
+3. 任意のディレクトリで実行する
 
-cd restapi-server
+```bash
+go run cmd/main.go
 ```
 
 ## Reference
 
-- [リリースブログ](https://go.dev/blog/gonew)
-- [フィードバックはこちら](https://github.com/golang/go/discussions/61669)
+- [Go公式サイト](https://go.dev/)
 
 ## Ackknowledgement
 
