@@ -21,4 +21,6 @@
 go.work
 .DS_Store
 environment/
+.gitignore
+*.log
 *.http
