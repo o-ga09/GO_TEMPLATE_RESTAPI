@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/o-ga09/api/internal/domain/administrator"
 	administratorDomain "github.com/o-ga09/api/internal/domain/administrator"
 	"github.com/o-ga09/api/internal/driver/mysql/scheme"
 	"gorm.io/gorm"
@@ -26,7 +25,7 @@ func (ad *AdminDriver) Delete(ctx context.Context, id string) error {
 }
 
 // FindUser implements administrator.AdminServiceRepository.
-func (ad *AdminDriver) FindUser(ctx context.Context, id string) (*administrator.Administrator, error) {
+func (ad *AdminDriver) FindUser(ctx context.Context, id string) (*administratorDomain.Administrator, error) {
 	user := scheme.Administrator{}
 
 	err := ad.conn.Where("user_id = ?", id).Find(&user).Error
@@ -35,7 +34,7 @@ func (ad *AdminDriver) FindUser(ctx context.Context, id string) (*administrator.
 		return nil, gorm.ErrRecordNotFound
 	}
 
-	res := administratorDomain.NewAdministrator(user.User_id,user.Admin)
+	res := administratorDomain.NewAdministrator(user.User_id, user.Admin)
 	if err != nil {
 		return nil, err
 	}
@@ -43,10 +42,10 @@ func (ad *AdminDriver) FindUser(ctx context.Context, id string) (*administrator.
 }
 
 // Save implements administrator.AdminServiceRepository.
-func (ad *AdminDriver) Save(ctx context.Context, param *administrator.Administrator) error {
+func (ad *AdminDriver) Save(ctx context.Context, param *administratorDomain.Administrator) error {
 	repoUser := scheme.Administrator{
 		User_id: param.GetUUID(),
-		Admin: param.GetAdmin(),
+		Admin:   param.GetAdmin(),
 	}
 
 	err := ad.conn.Save(&repoUser).Error
