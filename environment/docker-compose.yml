@@ -9,7 +9,7 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
       MYSQL_USER: api
       MYSQL_PASSWORD: P@ssw0rd
-      MYSQL_DATABASE: api
+      MYSQL_DATABASE: devdb
       MYSQL_TCP_PORT: 3306
     volumes:
       - api-dbsrv01-data:/var/lib/mysql
@@ -17,39 +17,24 @@ services:
       - ./mysql/init:/docker-entrypoint-initdb.d
     ports:
       - "3306:3306"
-    networks:
-      - replica-network
-  api-dbsrv-02:
-    image: redis:6.0-alpine3.18
-    container_name: api-dbsrv-02
-    ports:
-      - 6379:6379
-    networks:
-      - replica-network
+
   api-srv:
     image: api-srv
     depends_on:
       - api-dbsrv-01
-      - api-dbsrv-02
     build:
-      context: .
-      dockerfile: go/dockerfile
-      args:
-        - target=dev
+      target: dev
+      context: ../
+      dockerfile: environment/go/Dockerfile
     environment:
-      ENV: dev
-      PORT: 8000
-      DB_URL: api:P@ssw0rd@tcp(api-dbsrv-01)/api?charset=utf8&parseTime=True&loc=Local
-      REDIS_URL: "api-dbsrv-02:6379"
+      ENV: DEV
+      PORT: 8080
+      DATABASE_URL: api:P@ssw0rd@tcp(api-dbsrv-01)/devdb?charset=utf8&parseTime=True&loc=Local
+      ALLOW_URL: "*"
     volumes:
-      - .:/app
+      - ../:/app
     ports:
-      - "8000:8000"
-    restart: always
-    networks:
-      - replica-network
+      - "8080:8080"
+
 volumes:
   api-dbsrv01-data:
-networks:
-  replica-network:
-    driver: bridge
