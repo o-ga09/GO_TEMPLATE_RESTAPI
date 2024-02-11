@@ -20,10 +20,16 @@ cd GO_TEMPLATE_RESTAPI
 go mod tidy
 ```
 
-3. 任意のディレクトリで実行する
+3. アプリケーションを実行
 
 ```bash
 go run cmd/main.go
+```
+
+4. アプリケーションをテストする
+
+```bash
+go test ./...
 ```
 
 ## Reference
