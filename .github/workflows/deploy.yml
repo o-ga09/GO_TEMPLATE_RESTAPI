@@ -1,0 +1,99 @@
+##########################
+# secrets変数に設定すること
+# - SERVICE_NAME
+# - GCP_PROJECT_ID
+# - GCP_REGION
+# - GCP_REPOSITORY
+# - GCP_SERVICE_ACCOUNT
+# - GCP_SA_KEY
+#########################
+
+# workflowの名前
+name: GCP Deploy
+
+# ワークフローを実行する条件
+on:
+  # tagが v.で始まる時にワークフローが起動する
+  push:
+    branches-ignore:
+      - "**"
+    tags:
+      - "v*"
+
+# 環境変数を使用する
+env:
+  SERVICE_NAME: zenn-book-sample-api
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GCP_REGION: asia-northeast1
+  GCP_REPOSITORY: ${{ secrets.GCP_REPOSITORY }}
+  GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+  IMAGE: asia-northeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_REPOSITORY }}/${{ secrets.SERVICE_NAME }}:${{ github.sha }}
+
+# 実行するjobの定義
+jobs:
+  golang-test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      # ソースをチェックアウトする
+      - uses: actions/checkout@v2
+
+      # Goのセットアップをする
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.22
+      # Goのテストを実行する
+      - name: testing
+        run: |
+          go test ./... -coverprofile=coverage.out
+      # カバレッジれポートを出力する
+      - name: create report
+        uses: k1LoW/octocov-action@v0
+
+  build-containe-image:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - id: "auth"
+      uses: "google-github-actions/auth@v0"
+      with:
+        credentials_json: "${{ secrets.GCP_SA_KEY }}"
+
+    - name: Configure docker for artifact registry
+      run: |
+        gcloud auth configure-docker asia-northeast1-docker.pkg.dev
+
+    - name: Build a docker image
+      run: |
+        docker build --platform linux/amd64 -t ${{ env.IMAGE }} --target runtime ./
+
+    - name: Push the docker image
+      run: docker push ${{ env.IMAGE }}
+
+  deploy:
+    needs: 
+     - golang-test
+     - build-containe-image
+    if: ${{ needs.build-containe-image.result == 'success' && needs.golang-test.result == 'success' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - id: "auth"
+        uses: "google-github-actions/auth@v0"
+        with:
+          credentials_json: "${{ secrets.GCP_SA_KEY }}"
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image ${{ env.IMAGE }} \
+            --project ${{ env.GCP_PROJECT_ID }} \
+            --region ${{ env.GCP_REGION }} \
+            --platform=managed \
+            --allow-unauthenticated \
+            --service-account=${{ env.GCP_SERVICE_ACCOUNT }} \
+            --quiet \
+            --update-secrets=DATABASE_URL=DATABASE_URL:latest \

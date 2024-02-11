@@ -20,7 +20,8 @@
 # Go workspace file
 go.work
 .DS_Store
-environment/
+environment/tmp/
 .gitignore
 *.log
 *.http
+app

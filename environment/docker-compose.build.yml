@@ -1,0 +1,12 @@
+version: "3.9"
+services:
+  app:
+    image: ${IMAGE}
+    build:
+      target: deploy
+      context: ../
+      dockerfile: environment/go/Dockerfile
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"
