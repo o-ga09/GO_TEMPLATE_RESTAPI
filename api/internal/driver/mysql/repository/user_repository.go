@@ -38,11 +38,11 @@ func (ud *UserDriver) FindUser(ctx context.Context) ([]*userDomain.User, int64, 
 	users := []*scheme.User{}
 	var totalCount int64
 
-	limit, err := strconv.Atoi(ctxValue.Limit)
+	limit, err := strconv.Atoi(ctxValue.PageLimit)
 	if err != nil {
 		limit = 100
 	}
-	offset, err := strconv.Atoi(ctxValue.Offset)
+	offset, err := strconv.Atoi(ctxValue.PageOffset)
 	if err != nil {
 		offset = 0
 	}

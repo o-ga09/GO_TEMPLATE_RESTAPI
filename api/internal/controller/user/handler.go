@@ -31,8 +31,7 @@ func (h *UserHandler) GetUsers(ctx *gin.Context) {
 	userId := ctx.Query("userid")
 	request_id := ctx.GetHeader("X-Request-ID")
 
-	var reqCtx context.Context
-	reqCtx = context.WithValue(ctx, "ctxInfo", pkg.CtxInfo{Limit: limit, Offset: offset, UserId: userId, RequestId: request_id})
+	reqCtx := context.WithValue(ctx, "ctxInfo", pkg.CtxInfo{PageLimit: limit, PageOffset: offset, UserId: userId, RequestId: request_id})
 
 	res, err := h.FindUserUsecase.Run(reqCtx)
 	if err != nil {
@@ -42,19 +41,19 @@ func (h *UserHandler) GetUsers(ctx *gin.Context) {
 	}
 
 	response := []ResponseUser{}
-	for _, r := range res {
+	for _, r := range res.User {
 		user := &ResponseUser{User: ResponseUserModel{
-			ID:               r.GetUUID(),
-			Email:            r.GetEmail(),
-			Password:         r.GetPassWord(),
-			User_ID:          r.GetID(),
-			FirstName:        r.GetFirstName(),
-			LastName:         r.GetLastName(),
-			Gender:           r.GetGender(),
-			BirthDay:         r.GetBirthDay(),
-			PhoneNumber:      r.GetPhoneNumber(),
-			PostOfficeNumber: r.GetPostOfficeNumber(),
-			Address:          r.GetPref() + r.GetCity() + r.GetExtra(),
+			ID:               r.ID,
+			Email:            r.Email,
+			Password:         r.Password,
+			User_ID:          r.User_ID,
+			FirstName:        r.FirstName,
+			LastName:         r.LastName,
+			Gender:           r.Gender,
+			BirthDay:         r.BirthDay,
+			PhoneNumber:      r.PhoneNumber,
+			PostOfficeNumber: r.PostOfficeNumber,
+			Address:          r.Pref + r.City + r.Extra,
 		}}
 		response = append(response, *user)
 	}

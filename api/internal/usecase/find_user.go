@@ -92,8 +92,8 @@ func (us *FindUserUsecase) Run(ctx context.Context) (*FindUserUsecaseDto, error)
 		}
 		dtouser = append(dtouser, r)
 	}
-	limit, _ := strconv.Atoi(value.Limit)
-	offset, _ := strconv.Atoi(value.Offset)
+	limit, _ := strconv.Atoi(value.PageLimit)
+	offset, _ := strconv.Atoi(value.PageOffset)
 
 	dto.TotalCount = count
 	dto.Offset = limit + offset
