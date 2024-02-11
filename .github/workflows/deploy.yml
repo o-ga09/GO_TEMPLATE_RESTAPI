@@ -28,6 +28,9 @@ env:
   GCP_REPOSITORY: ${{ secrets.GCP_REPOSITORY }}
   GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }}
   IMAGE: asia-northeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_REPOSITORY }}/${{ secrets.SERVICE_NAME }}:${{ github.sha }}
+# migration用
+  ENV: production
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
 # 実行するjobの定義
 jobs:
@@ -73,11 +76,26 @@ jobs:
     - name: Push the docker image
       run: docker push ${{ env.IMAGE }}
 
+  migrate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install sql-migrate tool
+        run: |
+          go install -v github.com/rubenv/sql-migrate/...@latest
+
+      - name: Migrate
+        run: |
+          sql-migrate up -config=./environment/mysql/migrate/migrate.yml -env=${{ env.ENV }}
   deploy:
     needs: 
      - golang-test
      - build-containe-image
-    if: ${{ needs.build-containe-image.result == 'success' && needs.golang-test.result == 'success' }}
+     - migrate
+    if: ${{ needs.build-containe-image.result == 'success' && needs.golang-test.result == 'success' &&  needs.migrate.result == 'success' }}
     runs-on: ubuntu-latest
 
     steps:

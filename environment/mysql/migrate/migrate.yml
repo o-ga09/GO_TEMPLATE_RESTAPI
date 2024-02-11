@@ -1,0 +1,15 @@
+# DEV用
+development:
+  dialect: mysql
+  dir: environment/mysql/migrate
+  datasource: ${DATABASE_URL}
+# STG用
+staging:
+  dialect: mysql
+  dir: environment/mysql/migrate
+  datasource: ${DATABASE_URL}
+# PROD用
+production:
+  dialect: mysql
+  dir: environment/mysql/migrate
+  datasource: ${DATABASE_URL}
