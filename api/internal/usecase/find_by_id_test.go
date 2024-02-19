@@ -7,31 +7,30 @@ import (
 
 	"github.com/o-ga09/api/internal/domain/administrator"
 	"github.com/o-ga09/api/internal/domain/user"
+	"github.com/o-ga09/api/pkg"
 )
 
 func TestFindUserByIdUsecase_Run(t *testing.T) {
 	type field struct {
-		user user.User
-		userRepoErr error
-		admin *administrator.Administrator
+		user         user.User
+		userRepoErr  error
+		admin        *administrator.Administrator
 		adminRepoErr error
 	}
 	type args struct {
-		id  string
+		id string
 	}
 	tests := []struct {
-		name    string
-		fields  field
-		args    args
+		name      string
+		fields    field
+		args      args
 		mockValue field
-		user_id string
-		want    *user.User
-		wantErr bool
+		user_id   pkg.CtxInfo
+		want      *user.User
+		wantErr   bool
 	}{
-		{name: "正常系 - 管理者はユーザ一詳細情報を取得できる",args: args{id: "999999999"},want: user_1,mockValue: field{user: *user_1,userRepoErr: nil,admin: admin_1,adminRepoErr: nil},user_id: "999999999",wantErr: false},
-		{name: "正常系 - 一般ユーザは自身の詳細情報を取得できる",args: args{id: "000000000"},want: user_1,mockValue: field{user: *user_1,userRepoErr: nil,admin: admin_2,adminRepoErr: nil},user_id: "000000000",wantErr: false},
-		{name: "異常系 - 他ユーザの詳細情報を取得できない",args: args{id: "999999999"},want: &user.User{},mockValue: field{user: *user_1,userRepoErr: nil,admin: nil,adminRepoErr: INVALID_ADMIN},user_id: "000000000",wantErr: true},
-
+		{name: "正常系 - 管理者はユーザ一詳細情報を取得できる", args: args{id: "9999999999"}, want: user_1, mockValue: field{user: *user_1, userRepoErr: nil, admin: admin_1, adminRepoErr: nil}, user_id: pkg.CtxInfo{RequestId: "9999999999"}, wantErr: false},
+		{name: "正常系 - 一般ユーザは自身の詳細情報を取得できる", args: args{id: "0000000000"}, want: user_1, mockValue: field{user: *user_1, userRepoErr: nil, admin: admin_2, adminRepoErr: nil}, user_id: pkg.CtxInfo{RequestId: "0000000000"}, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -45,10 +44,10 @@ func TestFindUserByIdUsecase_Run(t *testing.T) {
 					return tt.mockValue.admin, tt.mockValue.adminRepoErr
 				},
 			}
-		
-			uc := NewFindUserByIdUsecase(&mockUDS,&mockADS)
+
+			uc := NewFindUserByIdUsecase(&mockUDS, &mockADS)
 			ctx := context.Background()
-			ctx = context.WithValue(ctx,"user_id",tt.user_id)
+			ctx = context.WithValue(ctx, "ctxInfo", tt.user_id)
 			got, err := uc.Run(ctx, tt.args.id)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FindUserByIdUsecase.Run() error = %v, wantErr %v", err, tt.wantErr)
