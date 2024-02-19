@@ -25,9 +25,9 @@ env:
   SERVICE_NAME: zenn-book-sample-api
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   GCP_REGION: asia-northeast1
-  GCP_REPOSITORY: ${{ secrets.GCP_REPOSITORY }}
+  GCP_REPOSITORY: node-api
   GCP_SERVICE_ACCOUNT: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-  IMAGE: asia-northeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_REPOSITORY }}/${{ secrets.SERVICE_NAME }}:${{ github.sha }}
+  IMAGE: asia-northeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/node-api/zenn-book-sample-api:${{ github.sha }}
 # migration用
   ENV: production
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
